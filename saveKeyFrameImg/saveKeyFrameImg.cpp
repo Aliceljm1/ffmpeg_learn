@@ -69,27 +69,29 @@ const char* get_ffmpeg_error(int errnum) {
 AVFrame* createEmptyFrame(int width, int height, AVPixelFormat pixformat,int align)
 {
     AVFrame* pFrameRGB = av_frame_alloc();
-    pFrameRGB->format = pixformat;
+    pFrameRGB->format = pixformat;//存放的媒体是图片，
     pFrameRGB->width = width;
     pFrameRGB->height = height;
 
-    //av_frame_make_writable(pFrameRGB);//TODO 如果启用这个代码存在问题，调用sws_sacle之后的AVFrame数据是NULL
-    //return pFrameRGB;
-
-    int buffersize = av_image_get_buffer_size(pixformat,
-        width, height, align);//不同格式，不同对齐有不同的buffersize
-    uint8_t* buffer = (uint8_t*)av_malloc(buffersize);
+    av_frame_get_buffer(pFrameRGB,align);//依据媒体格式 初始化内存，
     
-    av_image_fill_arrays(pFrameRGB->data, pFrameRGB->linesize,
-        buffer, pixformat,
-        width, height, align);//需要把buffer和pFrameRGB关联起来,否则数据默认是空的
-
+    av_frame_make_writable(pFrameRGB);
     return pFrameRGB;
+
+    if (false) {//手动申请内存的方法，因为知道是图片所以直接依据规则申请内存，挂接到avframe中
+        int buffersize = av_image_get_buffer_size(pixformat,
+            width, height, align);//不同格式，不同对齐有不同的buffersize
+        uint8_t* buffer = (uint8_t*)av_malloc(buffersize);
+
+        av_image_fill_arrays(pFrameRGB->data, pFrameRGB->linesize,
+            buffer, pixformat,
+            width, height, align);//需要把buffer和pFrameRGB关联起来,否则数据默认是空的
+
+        return pFrameRGB;
+    }
 }
 
-
-//从h264文件中提取关键帧,保存为bitmap图片
-int main()
+int getkeyFrameToBitmap()
 {
     av_register_all();
 
@@ -99,7 +101,7 @@ int main()
     if (avformat_find_stream_info(ifmt_ctx, NULL) < 0)
         return -2;
 
-   int videoStream = -1;//找到视频流index，
+    int videoStream = -1;//找到视频流index，
     for (int i = 0; i < ifmt_ctx->nb_streams; i++)
         if (ifmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
             videoStream = i;
@@ -127,36 +129,37 @@ int main()
     if (pFrame == NULL)
         return -5;
 
-    AVFrame* pFrameRGB = createEmptyFrame(pCodecCtx->width, pCodecCtx->height, AV_PIX_FMT_RGB24,32);
+    AVFrame* pFrameRGB = createEmptyFrame(pCodecCtx->width, pCodecCtx->height, AV_PIX_FMT_RGB24, 32);
+
 
     //初始化sws上下文，
-    SwsContext* sws_ctx= sws_getContext(
-        pCodecCtx->width, 
+    SwsContext* sws_ctx = sws_getContext(
+        pCodecCtx->width,
         pCodecCtx->height, pCodecCtx->pix_fmt,
         pCodecCtx->width,
-        pCodecCtx->height, AV_PIX_FMT_RGB24,SWS_BILINEAR,NULL,NULL,NULL);
+        pCodecCtx->height, AV_PIX_FMT_RGB24, SWS_BILINEAR, NULL, NULL, NULL);
 
     int frameindex = 0;
     AVPacket packet;
     int ret = -1;
     int i = 0;
     while (av_read_frame(ifmt_ctx, &packet) >= 0) {
-        if (packet.stream_index == videoStream) { 
-           ret= avcodec_send_packet(pCodecCtx, &packet);
-            ret = avcodec_receive_frame(pCodecCtx,pFrame);
+        if (packet.stream_index == videoStream) {
+            ret = avcodec_send_packet(pCodecCtx, &packet);
+            ret = avcodec_receive_frame(pCodecCtx, pFrame);
             if (ret == 0 && pFrame->key_frame) {
                 //解码成功，并且是关键帧，则转换数据为RGB，保存到bitmap
                 //参数，上下文，数据数组，步长数组，源图y位置，结束y位置，
-                 ret=sws_scale(sws_ctx, 
+                ret = sws_scale(sws_ctx,
                     pFrame->data,
                     pFrame->linesize,
                     0,
                     pCodecCtx->height,
                     pFrameRGB->data,
                     pFrameRGB->linesize
-                    );
+                );
                 save_frame_as_bitmap(pFrameRGB, pCodecCtx->width,
-                    pCodecCtx->height,i++);
+                    pCodecCtx->height, i++);
             }
             else {
                 printf("decode error:%s\n", get_ffmpeg_error(ret));
@@ -172,6 +175,56 @@ int main()
     sws_freeContext(sws_ctx);
 
     avformat_close_input(&ifmt_ctx);
+}
+
+/**
+*测试AVFrame的内存初始化，浅拷贝，深拷贝
+* */
+void testAVFrameMem() 
+{
+    AVFrame* frame = av_frame_alloc();
+    frame->nb_samples = 1024;//1024个采样点
+    frame->format = AV_SAMPLE_FMT_S16;//每采样2字节
+    frame->channel_layout = AV_CH_LAYOUT_MONO;//单声道, 希腊语monos,单一的
+    AV_CH_LAYOUT_STEREO;//双声道
+   
+    int ret = av_frame_get_buffer(frame,0);//初始化内存，
+    int buf_ref_count = -1;
+    if (frame->buf && frame->buf[0]) {
+        buf_ref_count = av_buffer_get_ref_count(frame->buf[0]);
+        printf("1 frame->buf.size=%d,buf.ref.count=%d \n", frame->buf[0]->size, buf_ref_count);
+    }
+
+    AVFrame* newAVFrame = av_frame_alloc();
+    av_frame_ref(newAVFrame, frame);//newAVFrame引用frame的buffer数据区，refcount=2, 数据共享可读。
+
+    if (frame->buf && frame->buf[0]) {
+        buf_ref_count = av_buffer_get_ref_count(frame->buf[0]);//此时refcount=2;
+        printf("1.1 frame->buf.size=%d,buf.ref.count=%d \n", frame->buf[0]->size, buf_ref_count);
+    }
+
+    av_frame_make_writable(newAVFrame);//初始化新的buffer数据区
+
+
+    ret = av_frame_make_writable(frame);
+    buf_ref_count = av_buffer_get_ref_count(frame->buf[0]);
+    printf("2 frame->buf.size=%d,buf.ref.count=%d \n", frame->buf[0]->size, buf_ref_count);
+    
+    av_frame_unref(frame);
+    if (frame->buf && frame->buf[0]) {
+        buf_ref_count = av_buffer_get_ref_count(frame->buf[0]);
+        printf("3 frame->buf.size=%d,buf.ref.count=%d \n", frame->buf[0]->size, buf_ref_count);
+    }
+    
+    av_frame_free(&frame);
+
+}
+
+//从h264文件中提取关键帧,保存为bitmap图片
+int main()
+{
+    //getkeyFrameToBitmap();
+    testAVFrameMem();
 
     std::cout << "Hello World!\n";
 }
