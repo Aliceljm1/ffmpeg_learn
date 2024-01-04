@@ -1,0 +1,773 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B4824EFF-C340-425D-A4A8-E2E02A71A7AE}</ProjectGuid>
+    <RootNamespace>avcodec</RootNamespace>
+  </PropertyGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="smp_deps.props" />
+    <Import Project="libavcodec_files.props" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\nasm.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>ILBC_STATIC_DEFINE;HAVE_AV_CONFIG_H;_USE_MATH_DEFINES;DEBUG;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions Condition="$([System.String]::Copy($(PlatformToolset)).Contains('Intel'))">/Qvec- /Qsimd- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(AdditionalOptions)' == '' and '$(VisualStudioVersion)' != '12.0'">/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4244;4267;4018;4146;4028;4996;4090;4114;4308;4305;4005;4101;4554;4307;4273;4133;4544;4334;4293;4047;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>libbz2d.lib;libiconvd.lib;liblzmad.lib;libzlibd.lib;libx264d.lib;libx265d.lib;libxvidcored.lib;libilbcd.lib;libmp3lamed.lib;libopusd.lib;libspeexd.lib;libtheorad.lib;libvorbisd.lib;libvpxd.lib;libmfxd.lib;mfplat.lib;mfuuid.lib;strmiids.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/IGNORE:4006,4221,4049,4217,4197,4099,4264 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <PostBuildEvent>
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\ac3_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\adts_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avcodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avdct.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avfft.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\bsf.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_desc.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_id.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_par.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\d3d11va.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\defs.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dirac.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dv_profile.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dxva2.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\jni.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\mediacodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\packet.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\qsv.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vdpau.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version_major.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\videotoolbox.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vorbis_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\xvmc.h "$(OutDir)"\include\libavcodec
+mkdir "$(OutDir)"\licenses
+copy ..\COPYING.GPLv3 "$(OutDir)"\licenses\ffmpeg.txt</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>if exist ..\config.h (
+del ..\config.h
+)
+if exist ..\version.h (
+del ..\version.h
+)
+if exist ..\config.asm (
+del ..\config.asm
+)
+if exist ..\libavutil\avconfig.h (
+del ..\libavutil\avconfig.h
+)
+if exist ..\libavutil\ffversion.h (
+del ..\libavutil\ffversion.h
+)
+if exist "$(OutDir)"\include\libavcodec (
+rd /s /q "$(OutDir)"\include\libavcodec
+cd ../
+cd $(ProjectDir)
+)</Command>
+    </PreBuildEvent>
+    <NASM>
+      <IncludePaths>$(ProjectDir);$(ProjectDir)\..\;$(ProjectDir)\..\libavcodec\x86;%(IncludePaths)</IncludePaths>
+      <PreIncludeFiles>config.asm;%(PreIncludeFiles)</PreIncludeFiles>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </NASM>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ILBC_STATIC_DEFINE;_MSC_VER;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>ILBC_STATIC_DEFINE;HAVE_AV_CONFIG_H;_USE_MATH_DEFINES;DEBUG;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions Condition="$([System.String]::Copy($(PlatformToolset)).Contains('Intel'))">/Qvec- /Qsimd- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(AdditionalOptions)' == '' and '$(VisualStudioVersion)' != '12.0'">/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4244;4267;4018;4146;4028;4996;4090;4114;4308;4305;4005;4101;4554;4307;4273;4133;4544;4334;4293;4047;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>libbz2d.lib;libiconvd.lib;liblzmad.lib;libzlibd.lib;libx264d.lib;libx265d.lib;libxvidcored.lib;libilbcd.lib;libmp3lamed.lib;libopusd.lib;libspeexd.lib;libtheorad.lib;libvorbisd.lib;libvpxd.lib;libmfxd.lib;mfplat.lib;mfuuid.lib;strmiids.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/IGNORE:4006,4221,4049,4217,4197,4099,4264 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <PostBuildEvent>
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\ac3_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\adts_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avcodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avdct.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avfft.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\bsf.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_desc.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_id.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_par.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\d3d11va.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\defs.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dirac.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dv_profile.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dxva2.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\jni.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\mediacodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\packet.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\qsv.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vdpau.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version_major.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\videotoolbox.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vorbis_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\xvmc.h "$(OutDir)"\include\libavcodec
+mkdir "$(OutDir)"\licenses
+copy ..\COPYING.GPLv3 "$(OutDir)"\licenses\ffmpeg.txt</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>if exist ..\config.h (
+del ..\config.h
+)
+if exist ..\version.h (
+del ..\version.h
+)
+if exist ..\config.asm (
+del ..\config.asm
+)
+if exist ..\libavutil\avconfig.h (
+del ..\libavutil\avconfig.h
+)
+if exist ..\libavutil\ffversion.h (
+del ..\libavutil\ffversion.h
+)
+if exist "$(OutDir)"\include\libavcodec (
+rd /s /q "$(OutDir)"\include\libavcodec
+cd ../
+cd $(ProjectDir)
+)</Command>
+    </PreBuildEvent>
+    <NASM>
+      <IncludePaths>$(ProjectDir);$(ProjectDir)\..\;$(ProjectDir)\..\libavcodec\x86;%(IncludePaths)</IncludePaths>
+      <PreIncludeFiles>config.asm;%(PreIncludeFiles)</PreIncludeFiles>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </NASM>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ILBC_STATIC_DEFINE;_MSC_VER;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>X264_API_IMPORTS;HAVE_AV_CONFIG_H;_USE_MATH_DEFINES;DEBUG;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions Condition="$([System.String]::Copy($(PlatformToolset)).Contains('Intel'))">/Qvec- /Qsimd- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(AdditionalOptions)' == '' and '$(VisualStudioVersion)' != '12.0'">/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4244;4267;4018;4146;4028;4996;4090;4114;4308;4305;4005;4101;4554;4307;4273;4133;4544;4334;4293;4047;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>avutild.lib;swresampled.lib;bz2d.lib;iconvd.lib;lzmad.lib;zlibd.lib;x264d.lib;x265d.lib;xvidcored.lib;ilbcd.lib;mp3lamed.lib;opusd.lib;speexd.lib;theorad.lib;vorbisd.lib;vpxd.lib;mfxd.lib;mfplat.lib;mfuuid.lib;strmiids.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>.\libavcodec.def</ModuleDefinitionFile>
+      <AdditionalOptions>/IGNORE:4006,4221,4049,4217,4197,4099,4264 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\ac3_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\adts_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avcodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avdct.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avfft.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\bsf.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_desc.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_id.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_par.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\d3d11va.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\defs.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dirac.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dv_profile.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dxva2.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\jni.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\mediacodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\packet.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\qsv.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vdpau.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version_major.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\videotoolbox.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vorbis_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\xvmc.h "$(OutDir)"\include\libavcodec
+mkdir "$(OutDir)"\licenses
+copy ..\COPYING.GPLv3 "$(OutDir)"\licenses\ffmpeg.txt</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>if exist ..\config.h (
+del ..\config.h
+)
+if exist ..\version.h (
+del ..\version.h
+)
+if exist ..\config.asm (
+del ..\config.asm
+)
+if exist ..\libavutil\avconfig.h (
+del ..\libavutil\avconfig.h
+)
+if exist ..\libavutil\ffversion.h (
+del ..\libavutil\ffversion.h
+)
+if exist "$(OutDir)"\include\libavcodec (
+rd /s /q "$(OutDir)"\include\libavcodec
+cd ../
+cd $(ProjectDir)
+)</Command>
+    </PreBuildEvent>
+    <NASM>
+      <IncludePaths>$(ProjectDir);$(ProjectDir)\..\;$(ProjectDir)\..\libavcodec\x86;%(IncludePaths)</IncludePaths>
+      <PreIncludeFiles>config.asm;%(PreIncludeFiles)</PreIncludeFiles>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </NASM>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>X264_API_IMPORTS;_MSC_VER;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDLL|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>X264_API_IMPORTS;HAVE_AV_CONFIG_H;_USE_MATH_DEFINES;DEBUG;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions Condition="$([System.String]::Copy($(PlatformToolset)).Contains('Intel'))">/Qvec- /Qsimd- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(AdditionalOptions)' == '' and '$(VisualStudioVersion)' != '12.0'">/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4244;4267;4018;4146;4028;4996;4090;4114;4308;4305;4005;4101;4554;4307;4273;4133;4544;4334;4293;4047;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>avutild.lib;swresampled.lib;bz2d.lib;iconvd.lib;lzmad.lib;zlibd.lib;x264d.lib;x265d.lib;xvidcored.lib;ilbcd.lib;mp3lamed.lib;opusd.lib;speexd.lib;theorad.lib;vorbisd.lib;vpxd.lib;mfxd.lib;mfplat.lib;mfuuid.lib;strmiids.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>.\libavcodec.def</ModuleDefinitionFile>
+      <AdditionalOptions>/IGNORE:4006,4221,4049,4217,4197,4099,4264 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\ac3_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\adts_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avcodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avdct.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avfft.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\bsf.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_desc.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_id.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_par.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\d3d11va.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\defs.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dirac.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dv_profile.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dxva2.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\jni.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\mediacodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\packet.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\qsv.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vdpau.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version_major.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\videotoolbox.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vorbis_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\xvmc.h "$(OutDir)"\include\libavcodec
+mkdir "$(OutDir)"\licenses
+copy ..\COPYING.GPLv3 "$(OutDir)"\licenses\ffmpeg.txt</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>if exist ..\config.h (
+del ..\config.h
+)
+if exist ..\version.h (
+del ..\version.h
+)
+if exist ..\config.asm (
+del ..\config.asm
+)
+if exist ..\libavutil\avconfig.h (
+del ..\libavutil\avconfig.h
+)
+if exist ..\libavutil\ffversion.h (
+del ..\libavutil\ffversion.h
+)
+if exist "$(OutDir)"\include\libavcodec (
+rd /s /q "$(OutDir)"\include\libavcodec
+cd ../
+cd $(ProjectDir)
+)</Command>
+    </PreBuildEvent>
+    <NASM>
+      <IncludePaths>$(ProjectDir);$(ProjectDir)\..\;$(ProjectDir)\..\libavcodec\x86;%(IncludePaths)</IncludePaths>
+      <PreIncludeFiles>config.asm;%(PreIncludeFiles)</PreIncludeFiles>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </NASM>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>X264_API_IMPORTS;_MSC_VER;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>ILBC_STATIC_DEFINE;HAVE_AV_CONFIG_H;_USE_MATH_DEFINES;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions Condition="$([System.String]::Copy($(PlatformToolset)).Contains('Intel'))">/Qvec- /Qsimd- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(AdditionalOptions)' == '' and '$(VisualStudioVersion)' != '12.0'">/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4244;4267;4018;4146;4028;4996;4090;4114;4308;4305;4005;4101;4554;4307;4273;4133;4544;4334;4293;4047;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>libbz2.lib;libiconv.lib;liblzma.lib;libzlib.lib;libx264.lib;libx265.lib;libxvidcore.lib;libilbc.lib;libmp3lame.lib;libopus.lib;libspeex.lib;libtheora.lib;libvorbis.lib;libvpx.lib;libmfx.lib;mfplat.lib;mfuuid.lib;strmiids.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/IGNORE:4006,4221,4049,4217,4197,4099,4264 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <PostBuildEvent>
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\ac3_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\adts_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avcodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avdct.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avfft.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\bsf.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_desc.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_id.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_par.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\d3d11va.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\defs.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dirac.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dv_profile.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dxva2.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\jni.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\mediacodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\packet.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\qsv.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vdpau.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version_major.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\videotoolbox.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vorbis_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\xvmc.h "$(OutDir)"\include\libavcodec
+mkdir "$(OutDir)"\licenses
+copy ..\COPYING.GPLv3 "$(OutDir)"\licenses\ffmpeg.txt</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>if exist ..\config.h (
+del ..\config.h
+)
+if exist ..\version.h (
+del ..\version.h
+)
+if exist ..\config.asm (
+del ..\config.asm
+)
+if exist ..\libavutil\avconfig.h (
+del ..\libavutil\avconfig.h
+)
+if exist ..\libavutil\ffversion.h (
+del ..\libavutil\ffversion.h
+)
+if exist "$(OutDir)"\include\libavcodec (
+rd /s /q "$(OutDir)"\include\libavcodec
+cd ../
+cd $(ProjectDir)
+)</Command>
+    </PreBuildEvent>
+    <NASM>
+      <IncludePaths>$(ProjectDir);$(ProjectDir)\..\;$(ProjectDir)\..\libavcodec\x86;%(IncludePaths)</IncludePaths>
+      <PreIncludeFiles>config.asm;%(PreIncludeFiles)</PreIncludeFiles>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </NASM>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ILBC_STATIC_DEFINE;_MSC_VER;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>ILBC_STATIC_DEFINE;HAVE_AV_CONFIG_H;_USE_MATH_DEFINES;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions Condition="$([System.String]::Copy($(PlatformToolset)).Contains('Intel'))">/Qvec- /Qsimd- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(AdditionalOptions)' == '' and '$(VisualStudioVersion)' != '12.0'">/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4244;4267;4018;4146;4028;4996;4090;4114;4308;4305;4005;4101;4554;4307;4273;4133;4544;4334;4293;4047;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>libbz2.lib;libiconv.lib;liblzma.lib;libzlib.lib;libx264.lib;libx265.lib;libxvidcore.lib;libilbc.lib;libmp3lame.lib;libopus.lib;libspeex.lib;libtheora.lib;libvorbis.lib;libvpx.lib;libmfx.lib;mfplat.lib;mfuuid.lib;strmiids.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/IGNORE:4006,4221,4049,4217,4197,4099,4264 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <PostBuildEvent>
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\ac3_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\adts_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avcodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avdct.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avfft.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\bsf.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_desc.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_id.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_par.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\d3d11va.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\defs.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dirac.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dv_profile.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dxva2.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\jni.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\mediacodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\packet.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\qsv.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vdpau.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version_major.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\videotoolbox.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vorbis_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\xvmc.h "$(OutDir)"\include\libavcodec
+mkdir "$(OutDir)"\licenses
+copy ..\COPYING.GPLv3 "$(OutDir)"\licenses\ffmpeg.txt</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>if exist ..\config.h (
+del ..\config.h
+)
+if exist ..\version.h (
+del ..\version.h
+)
+if exist ..\config.asm (
+del ..\config.asm
+)
+if exist ..\libavutil\avconfig.h (
+del ..\libavutil\avconfig.h
+)
+if exist ..\libavutil\ffversion.h (
+del ..\libavutil\ffversion.h
+)
+if exist "$(OutDir)"\include\libavcodec (
+rd /s /q "$(OutDir)"\include\libavcodec
+cd ../
+cd $(ProjectDir)
+)</Command>
+    </PreBuildEvent>
+    <NASM>
+      <IncludePaths>$(ProjectDir);$(ProjectDir)\..\;$(ProjectDir)\..\libavcodec\x86;%(IncludePaths)</IncludePaths>
+      <PreIncludeFiles>config.asm;%(PreIncludeFiles)</PreIncludeFiles>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </NASM>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ILBC_STATIC_DEFINE;_MSC_VER;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>X264_API_IMPORTS;HAVE_AV_CONFIG_H;_USE_MATH_DEFINES;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions Condition="$([System.String]::Copy($(PlatformToolset)).Contains('Intel'))">/Qvec- /Qsimd- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(AdditionalOptions)' == '' and '$(VisualStudioVersion)' != '12.0'">/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4244;4267;4018;4146;4028;4996;4090;4114;4308;4305;4005;4101;4554;4307;4273;4133;4544;4334;4293;4047;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>avutil.lib;swresample.lib;bz2.lib;iconv.lib;lzma.lib;zlib.lib;x264.lib;x265.lib;xvidcore.lib;ilbc.lib;mp3lame.lib;opus.lib;speex.lib;theora.lib;vorbis.lib;vpx.lib;mfx.lib;mfplat.lib;mfuuid.lib;strmiids.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>.\libavcodec.def</ModuleDefinitionFile>
+      <AdditionalOptions>/IGNORE:4006,4221,4049,4217,4197,4099,4264 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\ac3_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\adts_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avcodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avdct.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avfft.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\bsf.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_desc.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_id.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_par.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\d3d11va.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\defs.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dirac.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dv_profile.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dxva2.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\jni.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\mediacodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\packet.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\qsv.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vdpau.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version_major.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\videotoolbox.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vorbis_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\xvmc.h "$(OutDir)"\include\libavcodec
+mkdir "$(OutDir)"\licenses
+copy ..\COPYING.GPLv3 "$(OutDir)"\licenses\ffmpeg.txt</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>if exist ..\config.h (
+del ..\config.h
+)
+if exist ..\version.h (
+del ..\version.h
+)
+if exist ..\config.asm (
+del ..\config.asm
+)
+if exist ..\libavutil\avconfig.h (
+del ..\libavutil\avconfig.h
+)
+if exist ..\libavutil\ffversion.h (
+del ..\libavutil\ffversion.h
+)
+if exist "$(OutDir)"\include\libavcodec (
+rd /s /q "$(OutDir)"\include\libavcodec
+cd ../
+cd $(ProjectDir)
+)</Command>
+    </PreBuildEvent>
+    <NASM>
+      <IncludePaths>$(ProjectDir);$(ProjectDir)\..\;$(ProjectDir)\..\libavcodec\x86;%(IncludePaths)</IncludePaths>
+      <PreIncludeFiles>config.asm;%(PreIncludeFiles)</PreIncludeFiles>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </NASM>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>X264_API_IMPORTS;_MSC_VER;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>X264_API_IMPORTS;HAVE_AV_CONFIG_H;_USE_MATH_DEFINES;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions Condition="$([System.String]::Copy($(PlatformToolset)).Contains('Intel'))">/Qvec- /Qsimd- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(AdditionalOptions)' == '' and '$(VisualStudioVersion)' != '12.0'">/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4244;4267;4018;4146;4028;4996;4090;4114;4308;4305;4005;4101;4554;4307;4273;4133;4544;4334;4293;4047;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>avutil.lib;swresample.lib;bz2.lib;iconv.lib;lzma.lib;zlib.lib;x264.lib;x265.lib;xvidcore.lib;ilbc.lib;mp3lame.lib;opus.lib;speex.lib;theora.lib;vorbis.lib;vpx.lib;mfx.lib;mfplat.lib;mfuuid.lib;strmiids.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>.\libavcodec.def</ModuleDefinitionFile>
+      <AdditionalOptions>/IGNORE:4006,4221,4049,4217,4197,4099,4264 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\ac3_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\adts_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avcodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avdct.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avfft.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\bsf.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_desc.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_id.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_par.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\d3d11va.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\defs.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dirac.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dv_profile.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dxva2.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\jni.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\mediacodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\packet.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\qsv.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vdpau.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version_major.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\videotoolbox.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vorbis_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\xvmc.h "$(OutDir)"\include\libavcodec
+mkdir "$(OutDir)"\licenses
+copy ..\COPYING.GPLv3 "$(OutDir)"\licenses\ffmpeg.txt</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>if exist ..\config.h (
+del ..\config.h
+)
+if exist ..\version.h (
+del ..\version.h
+)
+if exist ..\config.asm (
+del ..\config.asm
+)
+if exist ..\libavutil\avconfig.h (
+del ..\libavutil\avconfig.h
+)
+if exist ..\libavutil\ffversion.h (
+del ..\libavutil\ffversion.h
+)
+if exist "$(OutDir)"\include\libavcodec (
+rd /s /q "$(OutDir)"\include\libavcodec
+cd ../
+cd $(ProjectDir)
+)</Command>
+    </PreBuildEvent>
+    <NASM>
+      <IncludePaths>$(ProjectDir);$(ProjectDir)\..\;$(ProjectDir)\..\libavcodec\x86;%(IncludePaths)</IncludePaths>
+      <PreIncludeFiles>config.asm;%(PreIncludeFiles)</PreIncludeFiles>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </NASM>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>X264_API_IMPORTS;_MSC_VER;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDLLStaticDeps|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>ILBC_STATIC_DEFINE;HAVE_AV_CONFIG_H;_USE_MATH_DEFINES;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions Condition="$([System.String]::Copy($(PlatformToolset)).Contains('Intel'))">/Qvec- /Qsimd- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(AdditionalOptions)' == '' and '$(VisualStudioVersion)' != '12.0'">/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4244;4267;4018;4146;4028;4996;4090;4114;4308;4305;4005;4101;4554;4307;4273;4133;4544;4334;4293;4047;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>avutil.lib;swresample.lib;libbz2.lib;libiconv.lib;liblzma.lib;libzlib.lib;libx264.lib;libx265.lib;libxvidcore.lib;libilbc.lib;libmp3lame.lib;libopus.lib;libspeex.lib;libtheora.lib;libvorbis.lib;libvpx.lib;libmfx.lib;mfplat.lib;mfuuid.lib;strmiids.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>.\libavcodec.def</ModuleDefinitionFile>
+      <AdditionalOptions>/IGNORE:4006,4221,4049,4217,4197,4099,4264 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\ac3_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\adts_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avcodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avdct.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avfft.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\bsf.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_desc.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_id.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_par.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\d3d11va.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\defs.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dirac.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dv_profile.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dxva2.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\jni.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\mediacodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\packet.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\qsv.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vdpau.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version_major.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\videotoolbox.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vorbis_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\xvmc.h "$(OutDir)"\include\libavcodec
+mkdir "$(OutDir)"\licenses
+copy ..\COPYING.GPLv3 "$(OutDir)"\licenses\ffmpeg.txt</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>if exist ..\config.h (
+del ..\config.h
+)
+if exist ..\version.h (
+del ..\version.h
+)
+if exist ..\config.asm (
+del ..\config.asm
+)
+if exist ..\libavutil\avconfig.h (
+del ..\libavutil\avconfig.h
+)
+if exist ..\libavutil\ffversion.h (
+del ..\libavutil\ffversion.h
+)
+if exist "$(OutDir)"\include\libavcodec (
+rd /s /q "$(OutDir)"\include\libavcodec
+cd ../
+cd $(ProjectDir)
+)</Command>
+    </PreBuildEvent>
+    <NASM>
+      <IncludePaths>$(ProjectDir);$(ProjectDir)\..\;$(ProjectDir)\..\libavcodec\x86;%(IncludePaths)</IncludePaths>
+      <PreIncludeFiles>config.asm;%(PreIncludeFiles)</PreIncludeFiles>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </NASM>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ILBC_STATIC_DEFINE;_MSC_VER;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDLLStaticDeps|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>ILBC_STATIC_DEFINE;HAVE_AV_CONFIG_H;_USE_MATH_DEFINES;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions Condition="$([System.String]::Copy($(PlatformToolset)).Contains('Intel'))">/Qvec- /Qsimd- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(AdditionalOptions)' == '' and '$(VisualStudioVersion)' != '12.0'">/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4244;4267;4018;4146;4028;4996;4090;4114;4308;4305;4005;4101;4554;4307;4273;4133;4544;4334;4293;4047;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>avutil.lib;swresample.lib;libbz2.lib;libiconv.lib;liblzma.lib;libzlib.lib;libx264.lib;libx265.lib;libxvidcore.lib;libilbc.lib;libmp3lame.lib;libopus.lib;libspeex.lib;libtheora.lib;libvorbis.lib;libvpx.lib;libmfx.lib;mfplat.lib;mfuuid.lib;strmiids.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>.\libavcodec.def</ModuleDefinitionFile>
+      <AdditionalOptions>/IGNORE:4006,4221,4049,4217,4197,4099,4264 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <PostBuildEvent>
+      <Command>mkdir "$(OutDir)"\include
+mkdir "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\ac3_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\adts_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avcodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avdct.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\avfft.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\bsf.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_desc.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_id.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\codec_par.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\d3d11va.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\defs.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dirac.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dv_profile.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\dxva2.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\jni.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\mediacodec.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\packet.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\qsv.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vdpau.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\version_major.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\videotoolbox.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\vorbis_parser.h "$(OutDir)"\include\libavcodec
+copy ..\libavcodec\xvmc.h "$(OutDir)"\include\libavcodec
+mkdir "$(OutDir)"\licenses
+copy ..\COPYING.GPLv3 "$(OutDir)"\licenses\ffmpeg.txt</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>if exist ..\config.h (
+del ..\config.h
+)
+if exist ..\version.h (
+del ..\version.h
+)
+if exist ..\config.asm (
+del ..\config.asm
+)
+if exist ..\libavutil\avconfig.h (
+del ..\libavutil\avconfig.h
+)
+if exist ..\libavutil\ffversion.h (
+del ..\libavutil\ffversion.h
+)
+if exist "$(OutDir)"\include\libavcodec (
+rd /s /q "$(OutDir)"\include\libavcodec
+cd ../
+cd $(ProjectDir)
+)</Command>
+    </PreBuildEvent>
+    <NASM>
+      <IncludePaths>$(ProjectDir);$(ProjectDir)\..\;$(ProjectDir)\..\libavcodec\x86;%(IncludePaths)</IncludePaths>
+      <PreIncludeFiles>config.asm;%(PreIncludeFiles)</PreIncludeFiles>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </NASM>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\compat\atomics\win32\;$(OutDir)\include\opus;$(ProjectDir)\..\..\prebuilt\include\opus;.\;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ILBC_STATIC_DEFINE;_MSC_VER;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\nasm.targets" />
+  </ImportGroup>
+</Project>

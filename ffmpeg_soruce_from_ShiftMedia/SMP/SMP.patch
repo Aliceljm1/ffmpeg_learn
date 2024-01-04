@@ -1,0 +1,44 @@
+diff --git a/fftools/opt_common.c b/fftools/opt_common.c
+index c303db4d09..43209af1ab 100644
+--- a/fftools/opt_common.c
++++ b/fftools/opt_common.c
+@@ -48,6 +48,9 @@
+ #include "libavformat/avformat.h"
+ #include "libavformat/version.h"
+ 
++#include "libavfilter/avfilter.h"
++#include "libavfilter/version.h"
++
+ #include "libavdevice/avdevice.h"
+ #include "libavdevice/version.h"
+ 
+diff --git a/libavcodec/libx264.c b/libavcodec/libx264.c
+index 4ce3791ae8..14177b3016 100644
+--- a/libavcodec/libx264.c
++++ b/libavcodec/libx264.c
+@@ -37,10 +37,6 @@
+ #include "atsc_a53.h"
+ #include "sei.h"
+ 
+-#if defined(_MSC_VER)
+-#define X264_API_IMPORTS 1
+-#endif
+-
+ #include <x264.h>
+ #include <float.h>
+ #include <math.h>
+diff --git a/libavcodec/mfenc.c b/libavcodec/mfenc.c
+index 280941cf2e..24c863138d 100644
+--- a/libavcodec/mfenc.c
++++ b/libavcodec/mfenc.c
+@@ -56,6 +56,10 @@ typedef struct MFContext {
+ static int mf_choose_output_type(AVCodecContext *avctx);
+ static int mf_setup_context(AVCodecContext *avctx);
+ 
++#if HAVE_WINRT || HAVE_UWP
++DEFINE_GUID(IID_ICodecAPI, 0x901db4c7, 0x31ce, 0x41a2, 0x85,0xdc, 0x8f,0xa0,0xbf,0x41,0xb8,0xda);
++#endif
++
+ #define MF_TIMEBASE (AVRational){1, 10000000}
+ // Sentinel value only used by us.
+ #define MF_INVALID_TIME AV_NOPTS_VALUE

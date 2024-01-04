@@ -6,6 +6,8 @@
 #include <windows.h>
 //#define __STDC_CONSTANT_MACROS
 
+#pragma warning(disable : 4996)
+
 extern "C"
 {
 #include "libavutil/imgutils.h"
@@ -93,10 +95,10 @@ AVFrame* createEmptyFrame(int width, int height, AVPixelFormat pixformat,int ali
 
 int getkeyFrameToBitmap()
 {
-    av_register_all();
+    //av_register_all();
 
     AVFormatContext* ifmt_ctx = NULL;
-    if (avformat_open_input(&ifmt_ctx, "test.h264", 0, 0) != 0)
+    if (avformat_open_input(&ifmt_ctx, "..\\res\\test.h264", 0, 0) != 0)
         return -1;
     if (avformat_find_stream_info(ifmt_ctx, NULL) < 0)
         return -2;
@@ -117,7 +119,7 @@ int getkeyFrameToBitmap()
     //拷贝编码参数到上下文中，核心是pCodecCtx->extradata赋值
     avcodec_parameters_to_context(pCodecCtx, ifmt_ctx->streams[videoStream]->codecpar);
 
-    AVCodec* pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
+    const AVCodec* pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
     if (pCodec == NULL) {
         fprintf(stderr, "Unsupported codec!\n");
         return -1; // Codec not found
@@ -223,8 +225,12 @@ void testAVFrameMem()
 //从h264文件中提取关键帧,保存为bitmap图片
 int main()
 {
-    //getkeyFrameToBitmap();
-    testAVFrameMem();
+    char path[MAX_PATH];
+    GetCurrentDirectoryA(MAX_PATH, path);
+    std::cout << "Current path is : " << path << std::endl;
+
+    getkeyFrameToBitmap();
+    //testAVFrameMem();
 
     std::cout << "Hello World!\n";
 }
