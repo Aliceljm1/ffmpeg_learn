@@ -1,4 +1,6 @@
 ## ffmpeg-demuxer 详细解析媒体文件
+###  saveAACFromMediaFile
+### showInfoFromMediaFile
 
 ## saveKeyFrameImg 保存关键帧图片
 
