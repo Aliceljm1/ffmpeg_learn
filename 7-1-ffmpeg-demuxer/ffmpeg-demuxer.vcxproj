@@ -136,6 +136,9 @@
   <ItemGroup>
     <ClCompile Include="ffmpeg-demuxer.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="07-05-decode_audio.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

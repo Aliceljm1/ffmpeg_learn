@@ -433,9 +433,11 @@ failed:
     }
 }
 
+#include "07-05-decode_audio.h"
 
 int main(int argc, char** argv)
 {
+    decode_audio(argc,argv);
     const char* default_filename = "..\\res\\believe.mp4";
 
     saveAACFromMediaFile(default_filename);
