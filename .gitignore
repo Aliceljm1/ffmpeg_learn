@@ -2,3 +2,20 @@ Debug/
 ipch/
 
 *.sdf
+/Release/saveKeyFrameImg.pdb
+/Release/ffmpeg-demuxer.pdb
+/.vs
+/7-1-ffmpeg-demuxer/Release
+/Release/ffmpeg-demuxer.exe
+/Release/saveKeyFrameImg.exe
+/Release/TestC_CPP.exe
+/Release/TestC_CPP.pdb
+/lib/libavfilter.lib
+/lib/libavformat.lib
+/lib/libavcodec.lib
+/saveKeyFrameImg/3.bmp
+/saveKeyFrameImg/0.bmp
+/saveKeyFrameImg/1.bmp
+/saveKeyFrameImg/2.bmp
+/saveKeyFrameImg/Release
+/TestC_CPP/Release
