@@ -2,8 +2,8 @@
 ###  saveAACFromMediaFile
 ### showInfoFromMediaFile
 
-## saveKeyFrameImg 保存关键帧图片
-
+###  saveKeyFrameImg 保存关键帧图片
+### demux_mp4 输入mp4文件，输出h264文件和aac文件
 
 ## 调试ffmpeg库：
 进入地址：https://github.com/ShiftMediaProject/FFmpeg/releases?page=2

@@ -32,5 +32,8 @@
     <ClInclude Include="saveAACFromMediaFile.h">
       <Filter>源文件</Filter>
     </ClInclude>
+    <ClInclude Include="07-08-demuex-mp4.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
