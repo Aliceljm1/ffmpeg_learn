@@ -140,8 +140,12 @@
     <ClInclude Include="07-05-decode_audio.h" />
     <ClInclude Include="07-08-demuex-mp4.h" />
     <ClInclude Include="07-6-decode_video.h" />
+    <ClInclude Include="0709-avio_decode_audio.h" />
     <ClInclude Include="saveAACFromMediaFile.h" />
     <ClInclude Include="showInfoFromMediaFile.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ReadMe.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

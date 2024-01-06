@@ -9,12 +9,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+extern "C"{
 #include <libavutil/frame.h>
 #include <libavutil/mem.h>
 #include <libavutil/frame.h>
-
 #include <libavcodec/avcodec.h>
+
+}
 
 #define AUDIO_INBUF_SIZE 20480
 #define AUDIO_REFILL_THRESH 4096
@@ -95,6 +96,8 @@ static void decode(AVCodecContext* dec_ctx, AVPacket* pkt, AVFrame* frame,
         }
     }
 }
+
+
 // ²¥·Å·¶Àý£º   ffplay -ar 48000 -ac 2 -f f32le believe.pcm
 int decode_audio(int argc, char** argv)
 {
