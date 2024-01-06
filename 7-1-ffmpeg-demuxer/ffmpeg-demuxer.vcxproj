@@ -138,6 +138,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="07-05-decode_audio.h" />
+    <ClInclude Include="07-6-decode_video.h" />
+    <ClInclude Include="saveAACFromMediaFile.h" />
+    <ClInclude Include="showInfoFromMediaFile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

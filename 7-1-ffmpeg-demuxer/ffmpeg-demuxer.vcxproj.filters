@@ -23,5 +23,14 @@
     <ClInclude Include="07-05-decode_audio.h">
       <Filter>源文件</Filter>
     </ClInclude>
+    <ClInclude Include="07-6-decode_video.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="showInfoFromMediaFile.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="saveAACFromMediaFile.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
