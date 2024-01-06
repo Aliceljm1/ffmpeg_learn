@@ -194,7 +194,9 @@ void testAVFrameMem()
     int buf_ref_count = -1;
     if (frame->buf && frame->buf[0]) {
         buf_ref_count = av_buffer_get_ref_count(frame->buf[0]);
-        printf("1 frame->buf.size=%d,buf.ref.count=%d \n", frame->buf[0]->size, buf_ref_count);
+        printf("1 <frame->buf.size=%d,buf.ref.count=%d \n", frame->buf[0]->size, buf_ref_count);
+        if (frame->buf[0]->data == frame->data[0])
+            printf(" buf[0] addr==frame.data[0]");//两者指向同一块内存，管理是由buf[0]来管理的
     }
 
     AVFrame* newAVFrame = av_frame_alloc();
@@ -229,8 +231,8 @@ int main()
     GetCurrentDirectoryA(MAX_PATH, path);
     std::cout << "Current path is : " << path << std::endl;
 
-    getkeyFrameToBitmap();
-    //testAVFrameMem();
+    //getkeyFrameToBitmap();
+    testAVFrameMem();
 
     std::cout << "Hello World!\n";
 }
