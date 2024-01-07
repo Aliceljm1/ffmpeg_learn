@@ -38,6 +38,9 @@
     <ClInclude Include="0709-avio_decode_audio.h">
       <Filter>源文件</Filter>
     </ClInclude>
+    <ClInclude Include="07-10-1-audio_resample.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ReadMe.md" />

@@ -102,7 +102,7 @@ static void decode(AVCodecContext* dec_ctx, AVPacket* pkt, AVFrame* frame,
 #define BUF_SIZE 20480
 
 /**
-ffmpeg 会在xx时候，调用此函数，我们需要在buf中填充数据，给ffmpeg使用
+ffmpeg 会在avformat_open_input时候，调用此函数，我们需要在buf中填充数据，给ffmpeg使用
 也就是说read_packet名字是相对于ffmpeg而言的，ffmpeg是主体。
 **/
 static int read_packet(void* opaque, uint8_t* buf, int buf_size)
@@ -112,7 +112,6 @@ static int read_packet(void* opaque, uint8_t* buf, int buf_size)
 	if (read_size <= 0) {
 		return AVERROR_EOF;
 	}
-
 	return read_size;
 }
 
@@ -141,16 +140,19 @@ void decode_audio_to_file(AVCodecContext* codec_ctx, AVPacket* pkt, AVFrame* fra
 
 int avio_decode_audio(int argc, char** argv)
 {
-	AVFormatContext* fmt_ctx = avformat_alloc_context();
-	uint8_t* io_buffer = (uint8_t*)av_malloc(BUF_SIZE);
-	const char* infilename = "..\\res\\believe.aac";
 
+
+	const char* infilename = "..\\res\\believe.aac";
 	FILE* in_file =   fopen(infilename,"rb");
 	FILE* out_file = fopen("..\\res\\out.pcm", "wb");
+
+	uint8_t* io_buffer = (uint8_t*)av_malloc(BUF_SIZE);//自定义缓存空间
 	AVIOContext* avio_ctx = avio_alloc_context(io_buffer, BUF_SIZE,0,(void *)in_file,
 		read_packet, NULL, NULL);
+	AVFormatContext* fmt_ctx = avformat_alloc_context();
 	fmt_ctx->pb = avio_ctx;//一定要挂接起来，
 
+													//这里输入文件为NULL,
 	int ret =avformat_open_input(&fmt_ctx,NULL,NULL,NULL);
 
 	AVCodecID codec_id = strstr(infilename, "mp3") != NULL ? AV_CODEC_ID_MP3 : AV_CODEC_ID_AAC;
