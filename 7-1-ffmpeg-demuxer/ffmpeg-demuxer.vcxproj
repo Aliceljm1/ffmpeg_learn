@@ -142,6 +142,7 @@
     <ClInclude Include="07-10-1-audio_resample.h" />
     <ClInclude Include="07-6-decode_video.h" />
     <ClInclude Include="0709-avio_decode_audio.h" />
+    <ClInclude Include="08-01-encode_audio.h" />
     <ClInclude Include="saveAACFromMediaFile.h" />
     <ClInclude Include="showInfoFromMediaFile.h" />
   </ItemGroup>

@@ -84,7 +84,7 @@ static void decode(AVCodecContext* dec_ctx, AVPacket* pkt, AVFrame* frame,
             LLLLLLRRRRRRLLLLLLRRRRRRLLLLLLRRRRRRL...（每个LLLLLLRRRRRR为一个音频帧）
             而不带P的数据格式（即交错排列）排列方式为：
             LRLRLRLRLRLRLRLRLRLRLRLRLRLRLRLRLRLRL...（每个LR为一个音频样本）
-            对应：AV_SAMPLE_FMT_FLTP
+            对应：AV_SAMPLE_FMT_FLT
          播放范例：   ffplay -ar 48000 -ac 2 -f f32le believe.pcm
           */
         int datasize=frame->nb_samples* frame->channels * per_sample_szie;
