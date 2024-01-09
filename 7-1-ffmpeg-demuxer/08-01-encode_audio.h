@@ -156,11 +156,11 @@ static int encode(AVCodecContext* ctx, AVFrame* frame, AVPacket* pkt, FILE* outp
  * 这里只支持2通道的转换
 */
 void f32le_convert_to_fltp(float* f32le, float* fltp, int nb_samples) {
-    float* fltp_l = fltp;   // 左通道
-    float* fltp_r = fltp + nb_samples;   // 右通道
+    float* fltp_left = fltp;   // 左通道
+    float* fltp_right = fltp_left + nb_samples;   // 右通道
     for (int i = 0; i < nb_samples; i++) {
-        fltp_l[i] = f32le[i * 2];     //偶数位为左声道，奇数位为右声道
-        fltp_r[i] = f32le[i * 2 + 1];   // 可以尝试注释左声道或者右声道听听声音
+        fltp_left[i] = f32le[i * 2];     //偶数位为左声道，奇数位为右声道
+        fltp_right[i] = f32le[i * 2 + 1];   // 可以尝试注释左声道或者右声道听听声音
     }
 }
 /*
@@ -231,6 +231,7 @@ int encode_audio(int argc, char** argv)
         fprintf(stderr, "Could not allocate audio codec context\n");
         exit(1);
     }
+    //必须要设置编码器参数
     codec_ctx->codec_id = codec_id;
     codec_ctx->codec_type = AVMEDIA_TYPE_AUDIO;
     codec_ctx->bit_rate = 128 * 1024;
@@ -305,11 +306,11 @@ int encode_audio(int argc, char** argv)
         fprintf(stderr, "Could not allocate audio frame\n");
         exit(1);
     }
-    /* 每次送多少数据给编码器由 (宏观到微观)：
+    /* 每次送多少数据给编码器由也就是AVFrame的数据总大小，由如下三要素决定
      *  (1)channel_layout(通道布局情况);
      *  (2)frame_size(每帧单个通道的采样点数);
      *  (3)sample_fmt(采样点格式);
-     * 3要素决定，几个通道，每个通道多少个采样点，每个采样点多少个字节
+     *  (宏观到微观)：几个通道，每个通道多少个采样点，每个采样点多少个字节
      */
     frame->channel_layout = codec_ctx->channel_layout;
 
@@ -327,10 +328,11 @@ int encode_audio(int argc, char** argv)
         fprintf(stderr, "Could not allocate audio data buffers\n");
         exit(1);
     }
-    // 计算出每一帧的数据 单个采样点的字节 * 通道数目 * 每帧采样点数量
-    int frame_bytes = av_get_bytes_per_sample((AVSampleFormat)frame->format) \
-        * frame->channels \
-        * frame->nb_samples;
+    
+    // 计算出每一帧的数据 通道数目 *每帧采样数*  每个采样字节数
+    int frame_bytes = frame->channels * frame->nb_samples * \
+        av_get_bytes_per_sample((AVSampleFormat)frame->format);
+
     printf("frame_bytes=%d,framesize from buf array=%d\n", frame_bytes,framesize);
     uint8_t* pcm_buf = (uint8_t*)malloc(frame_bytes);
     if (!pcm_buf) {
@@ -372,6 +374,7 @@ int encode_audio(int argc, char** argv)
             // 将读取到的PCM数据填充到frame去，但要注意格式的匹配, 是planar还是packed都要区分清楚
             // 将本地的f32le packed模式的数据转为float palanar
             memset(pcm_temp_buf, 0, frame_bytes);
+
             f32le_convert_to_fltp((float*)pcm_buf, (float*)pcm_temp_buf, frame->nb_samples);
             ret = av_samples_fill_arrays(frame->data, frame->linesize,
                 pcm_temp_buf, frame->channels,
