@@ -357,6 +357,7 @@ int encode_audio(int argc, char** argv)
             //            continue;
         }
 
+
         /* 确保该frame可写, 如果编码器内部保持了内存参考计数，则需要重新拷贝一个备份
             目的是新写入的数据和编码器保存的数据不能产生冲突
         */

@@ -30,6 +30,21 @@ static char* av_get_err(int errnum)
 	return err_buf;
 }
 
+int getNaluHead(uint8_t* data, int len)
+{
+	if (len < 4) {
+		return -1;
+	}
+	if (data[3] == 0x00) {//4个0
+		return data[5];
+	}
+	else if (data[3] == 0x01) {//3个0
+		return data[4];
+	}
+
+	return -1;
+}
+
 static int encode(AVCodecContext* enc_ctx, AVFrame* frame, AVPacket* pkt,
 	FILE* outfile)
 {
@@ -59,11 +74,11 @@ static int encode(AVCodecContext* enc_ctx, AVFrame* frame, AVPacket* pkt,
 		}
 
 		if (pkt->flags & AV_PKT_FLAG_KEY)
-			printf("Write packet flags:%d pts:%3" PRId64 " dts:%3" PRId64 " (size:%5d)\n",
-				pkt->flags, pkt->pts, pkt->dts, pkt->size);
+			printf("Write packet NALUHead:0x%X pts:%3" PRId64 " dts:%3" PRId64 " (size:%5d)\n",
+				getNaluHead(pkt->data,pkt->size), pkt->pts, pkt->dts, pkt->size);
 		if (!pkt->flags)
-			printf("Write packet flags:%d pts:%3" PRId64 " dts:%3" PRId64 " (size:%5d)\n",
-				pkt->flags, pkt->pts, pkt->dts, pkt->size);
+			printf("Write packet NALUHead:0x%X pts:%3" PRId64 " dts:%3" PRId64 " (size:%5d)\n",
+				getNaluHead(pkt->data, pkt->size), pkt->pts, pkt->dts, pkt->size);
 		fwrite(pkt->data, 1, pkt->size, outfile);
 	}
 	return 0;
@@ -138,16 +153,16 @@ int encode_video(int argc, char** argv)
 		// ultrafast all encode time:2270ms
 		// medium all encode time:5815ms
 		// veryslow all encode time:19836ms
-		ret = av_opt_set(codec_ctx->priv_data, "preset", "medium", 0);
+		ret = av_opt_set(codec_ctx->priv_data, "preset", "ultrafast", 0);//ultrafast急速模式。medium中档模式。veryslow慢速模式
 		if (ret != 0) {
 			printf("av_opt_set preset failed\n");
 		}
-		ret = av_opt_set(codec_ctx->priv_data, "profile", "main", 0); // 默认是high
+		ret = av_opt_set(codec_ctx->priv_data, "profile", "main", 0); // 默认是high， 部分设备如QuickTime只支持baseline和main
 		if (ret != 0) {
 			printf("av_opt_set profile failed\n");
 		}
 		ret = av_opt_set(codec_ctx->priv_data, "tune", "zerolatency", 0); // 直播是才使用该设置
-		//        ret = av_opt_set(codec_ctx->priv_data, "tune","film",0); //  画质film
+		//        ret = av_opt_set(codec_ctx->priv_data, "tune","film",0); //  画质film,电影级别，画质高
 		if (ret != 0) {
 			printf("av_opt_set tune failed\n");
 		}
@@ -157,16 +172,17 @@ int encode_video(int argc, char** argv)
 	 * 设置编码器参数
 	*/
 	/* 设置bitrate */
-	codec_ctx->bit_rate = 3000000;
+	codec_ctx->bit_rate = 3500000;
 	//    codec_ctx->rc_max_rate = 3000000;
 	//    codec_ctx->rc_min_rate = 3000000;
 	//    codec_ctx->rc_buffer_size = 2000000;
-	//    codec_ctx->thread_count = 4;  // 开了多线程后也会导致帧输出延迟, 需要缓存thread_count帧后再编程。
+	//    codec_ctx->thread_count = 4;  // 开了多线程后也会导致帧输出延迟, 需要缓存thread_count帧后再编码输出packet。
 	//    codec_ctx->thread_type = FF_THREAD_FRAME; // 并 设置为FF_THREAD_FRAME
-		/* 对于H264 AV_CODEC_FLAG_GLOBAL_HEADER  设置则只包含I帧，此时sps pps需要从codec_ctx->extradata读取
+		
+	/* 对于H264 AV_CODEC_FLAG_GLOBAL_HEADER  设置之后编码出的帧不包含SPS,PPS，此时sps pps需要从codec_ctx->extradata读取
 		 *  不设置则每个I帧都带 sps pps sei
 		 */
-		 //    codec_ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER; // 存本地文件时不要去设置
+		 //    codec_ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER; //  存本地文件时不要去设置
 
 			 /* 将codec_ctx和codec进行绑定 */
 	ret = avcodec_open2(codec_ctx, codec, NULL);
