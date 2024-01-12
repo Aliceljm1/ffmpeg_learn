@@ -8,9 +8,6 @@
     <Import Project="smp_deps.props" />
     <Import Project="libavutil_files.props" />
   </ImportGroup>
-  <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\nasm.props" />
-  </ImportGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>HAVE_AV_CONFIG_H;_USE_MATH_DEFINES;DEBUG;BUILDING_avutil;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -1407,7 +1404,4 @@ cd $(ProjectDir)
       <PreprocessorDefinitions>_MSC_VER;BUILDING_avutil;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\nasm.targets" />
-  </ImportGroup>
 </Project>

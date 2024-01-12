@@ -11,3 +11,6 @@
 下载编译好的lib,pdb,和对应的源代码
 直接引用就能编译调试，注意需引用产物中的include
 当前调试版本：FFmpeg-5.1.r106626
+
+## 下载静态编译好的版本地址  shared版本 包含拆分的dll 
+https://github.com/advancedfx/ffmpeg.zeranoe.com-builds-mirror

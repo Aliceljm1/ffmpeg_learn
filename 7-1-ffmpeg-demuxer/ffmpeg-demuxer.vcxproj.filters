@@ -19,6 +19,9 @@
     <Filter Include="源文件\decode">
       <UniqueIdentifier>{c3bf4a59-9c2c-4ace-abf7-480c5d0959d8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\muxer">
+      <UniqueIdentifier>{6fa770aa-6335-4e9c-9989-143f0dd09cfd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ffmpeg-demuxer.cpp">
@@ -52,6 +55,9 @@
     </ClInclude>
     <ClInclude Include="08-02-encode_video.h">
       <Filter>源文件\encode</Filter>
+    </ClInclude>
+    <ClInclude Include="08-03-muxing_flv.h">
+      <Filter>源文件\muxer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

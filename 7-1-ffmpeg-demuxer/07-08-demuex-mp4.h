@@ -122,7 +122,7 @@ void video_pkt_saveto_h264_file(AVPacket* pkt, AVFormatContext* fmt_ctx, FILE* f
 			}
 			fwrite(pkt->data, 1, pkt->size, file);
 			av_packet_unref(pkt);//释放pkt的buf，否则内存泄露，注意不是释放释放结构体
-		}
+		}  
 	}
 }
 

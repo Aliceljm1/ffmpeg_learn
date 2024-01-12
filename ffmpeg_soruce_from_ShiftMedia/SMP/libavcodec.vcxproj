@@ -8,9 +8,6 @@
     <Import Project="smp_deps.props" />
     <Import Project="libavcodec_files.props" />
   </ImportGroup>
-  <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\nasm.props" />
-  </ImportGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>ILBC_STATIC_DEFINE;HAVE_AV_CONFIG_H;_USE_MATH_DEFINES;DEBUG;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -767,7 +764,4 @@ cd $(ProjectDir)
       <PreprocessorDefinitions>ILBC_STATIC_DEFINE;_MSC_VER;BUILDING_avcodec;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\nasm.targets" />
-  </ImportGroup>
 </Project>
