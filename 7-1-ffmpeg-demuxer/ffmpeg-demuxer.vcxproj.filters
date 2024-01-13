@@ -56,9 +56,6 @@
     <ClInclude Include="08-02-encode_video.h">
       <Filter>源文件\encode</Filter>
     </ClInclude>
-    <ClInclude Include="08-03-muxing_flv.h">
-      <Filter>源文件\muxer</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ReadMe.md" />

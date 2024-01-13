@@ -81,6 +81,7 @@ typedef struct OutputStream
 
 static void log_packet(const AVFormatContext* fmt_ctx, const AVPacket* pkt)
 {
+	//packet是压缩数据，时间基是基于所在 stream的time_base
 	AVRational* time_base = &fmt_ctx->streams[pkt->stream_index]->time_base;
 
 	printf("pts:%s pts_time:%s dts:%s dts_time:%s duration:%s duration_time:%s stream_index:%d\n",
@@ -95,7 +96,7 @@ static int write_frame(AVFormatContext* fmt_ctx, const AVRational* time_base,
 {
 	/* rescale output packet timestamp values from codec to stream timebase */
 	// 将packet的timestamp由codec to stream timebase pts_before = -1024
-	av_packet_rescale_ts(pkt, *time_base, st->time_base);
+	av_packet_rescale_ts(pkt, *time_base, st->time_base);//需要把pkt的pts和dts转换成stream的timebase 才能调用av_interleaved_write_frame
 	pkt->stream_index = st->index;  // pts_before * 1/44100 = pts_after *1/1000
 	// pts_after = pts_before * 1/44100 * 1000 = -1024 * 1/44100 * 1000 = -23
 	/* Write the compressed frame to the media file. */
@@ -119,7 +120,7 @@ static void add_stream(OutputStream* ost, AVFormatContext* oc,
 			avcodec_get_name(codec_id));
 		exit(1);
 	}
-	// 新建码流 绑定到 AVFormatContext stream->index 有设置
+	// 新建码流 绑定到 AVFormatContext stream->index 有设置 oc->streams 有新值，且oc->nb_streams+1
 	ost->st = avformat_new_stream(oc, NULL);    // 创建一个流成分
 	if (!ost->st)
 	{
@@ -310,7 +311,9 @@ static void open_audio(AVFormatContext* oc, AVCodec* codec, OutputStream* ost, A
 }
 
 /* Prepare a 16 bit dummy audio frame of 'frame_size' samples and
- * 'nb_channels' channels. */
+ * 'nb_channels' channels.
+ * 生成正弦波PCM数据
+ */
 static AVFrame* get_audio_frame(OutputStream* ost)
 {
 	AVFrame* frame = ost->tmp_frame;
@@ -319,7 +322,7 @@ static AVFrame* get_audio_frame(OutputStream* ost)
 
 	/* check if we want to generate more frames */
 	// 44100 * {1, 44100} = 1  -》44100*5 * {1, 44100} = 5
-	// 5 *{1,1} = 5
+	// 5 *{1,1} = 5 
 	AVRational	time_base = { 1, 1 };
 	if (av_compare_ts(ost->next_pts, ost->enc->time_base,
 		STREAM_DURATION, time_base) >= 0)
@@ -408,7 +411,7 @@ static int write_audio_frame(AVFormatContext* oc, OutputStream* ost)
 			exit(1);
 		}
 	}
-	// frame == NULL 读取不到frame（比如读完了5秒的frame）; got_packet == 0 没有帧了
+	//什么时候返回1，  frame == NULL 读取不到frame（比如读完了5秒的frame）没有源头数据了; got_packet == 0 没有编码好的帧了
 	return (frame || got_packet) ? 0 : 1;
 }
 
@@ -719,7 +722,7 @@ int muxing_flv_ffmpeg4(int argc, char** argv)
 	while (encode_video || encode_audio)
 	{
 		/* select the stream to encode */
-		if (encode_video &&         // video_st.next_pts值 <= audio_st.next_pts时
+		if (encode_video &&         // video_st.next_pts值 <= audio_st.next_pts时  谁的时间在前面就先编码哪一个，确保音视频同步播放
 			(!encode_audio || av_compare_ts(video_st.next_pts, video_st.enc->time_base,
 				audio_st.next_pts, audio_st.enc->time_base) <= 0)) {
 			printf("\nwrite_video_frame\n");
