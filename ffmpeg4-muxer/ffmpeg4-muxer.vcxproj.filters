@@ -18,9 +18,33 @@
     <ClCompile Include="ffmpeg4-muxer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="videoencoder.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="audioencoder.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="muxer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="audioresampler.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="08-03-muxing_flv-ffmpeg4x.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="videoencoder.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="audioencoder.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="audioresampler.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="muxer.h">
       <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>

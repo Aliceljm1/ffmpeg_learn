@@ -2,10 +2,18 @@
 //
 
 #include <iostream>
-#include "08-03-muxing_flv-ffmpeg4x.h"
+#include "muxing_mp4.h"
+
+#pragma comment(lib, "../ffmpeg-4.2.1/lib/avformat.lib")
+#pragma comment(lib, "../ffmpeg-4.2.1/lib/avcodec.lib")
+#pragma comment(lib, "../ffmpeg-4.2.1/lib/avutil.lib")
+#pragma comment(lib, "../ffmpeg-4.2.1/lib/swresample.lib")
+#pragma comment(lib, "../ffmpeg-4.2.1/lib/swscale.lib")
+
 
 int main(int argc,char** argv)
 {
-    muxing_flv_ffmpeg4(argc, argv);
+    //muxing_flv_ffmpeg4(argc, argv);
+    muxing_mp4(argc,argv);
     std::cout << "Hello World!\n";
 }

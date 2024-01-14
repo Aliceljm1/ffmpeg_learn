@@ -132,10 +132,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="audioencoder.cpp" />
+    <ClCompile Include="audioresampler.cpp" />
     <ClCompile Include="ffmpeg4-muxer.cpp" />
+    <ClCompile Include="muxer.cpp" />
+    <ClCompile Include="videoencoder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="08-03-muxing_flv-ffmpeg4x.h" />
+    <ClInclude Include="audioencoder.h" />
+    <ClInclude Include="audioresampler.h" />
+    <ClInclude Include="muxer.h" />
+    <ClInclude Include="videoencoder.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
