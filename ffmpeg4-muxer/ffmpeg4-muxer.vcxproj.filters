@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="filter">
+      <UniqueIdentifier>{7d34e575-c22c-49c9-9199-ddb81f866a8e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ffmpeg4-muxer.cpp">
@@ -52,6 +55,9 @@
     </ClInclude>
     <ClInclude Include="muxing_mp4.h">
       <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="09-02-video-watermark.h">
+      <Filter>filter</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

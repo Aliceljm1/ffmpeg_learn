@@ -142,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="08-03-muxing_flv-ffmpeg4x.h" />
+    <ClInclude Include="09-02-video-watermark.h" />
     <ClInclude Include="audioencoder.h" />
     <ClInclude Include="audioresampler.h" />
     <ClInclude Include="muxer.h" />

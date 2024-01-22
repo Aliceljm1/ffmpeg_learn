@@ -10,10 +10,12 @@
 #pragma comment(lib, "../ffmpeg-4.2.1/lib/swresample.lib")
 #pragma comment(lib, "../ffmpeg-4.2.1/lib/swscale.lib")
 
+#include "09-02-video-watermark.h"
 
 int main(int argc,char** argv)
 {
     //muxing_flv_ffmpeg4(argc, argv);
-    muxing_mp4(argc,argv);
+    //muxing_mp4(argc,argv);
+    filterYuv(argc,argv);
     std::cout << "Hello World!\n";
 }
