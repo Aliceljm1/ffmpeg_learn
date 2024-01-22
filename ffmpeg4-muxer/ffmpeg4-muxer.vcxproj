@@ -94,10 +94,11 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../ffmpeg-4.2.1/include</AdditionalIncludeDirectories>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
@@ -136,6 +137,7 @@
     <ClCompile Include="audioresampler.cpp" />
     <ClCompile Include="ffmpeg4-muxer.cpp" />
     <ClCompile Include="muxer.cpp" />
+    <ClCompile Include="muxing_mp4.cpp" />
     <ClCompile Include="videoencoder.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +145,7 @@
     <ClInclude Include="audioencoder.h" />
     <ClInclude Include="audioresampler.h" />
     <ClInclude Include="muxer.h" />
+    <ClInclude Include="muxing_mp4.h" />
     <ClInclude Include="videoencoder.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

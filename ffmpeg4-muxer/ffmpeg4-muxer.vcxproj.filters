@@ -30,6 +30,9 @@
     <ClCompile Include="audioresampler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="muxing_mp4.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="08-03-muxing_flv-ffmpeg4x.h">
@@ -45,6 +48,9 @@
       <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="muxer.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="muxing_mp4.h">
       <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>

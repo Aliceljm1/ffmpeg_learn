@@ -48,7 +48,7 @@ int VideoEncoder::InitH264(int width, int height, int fps, int bit_rate)
     codec_ctx_->gop_size = fps_;
     codec_ctx_->max_b_frames = 0;
     codec_ctx_->pix_fmt = AV_PIX_FMT_YUV420P;
-//    av_dict_set(&dict_, "tune", "zerolatency", 0);
+    av_dict_set(&dict_, "tune", "zerolatency", 0);// 设置0延迟，编码器送入一个frame，立即输出一个packet
 
     int ret = avcodec_open2(codec_ctx_, NULL, &dict_);
     if(ret != 0) {
@@ -139,6 +139,7 @@ int VideoEncoder::Encode(uint8_t *yuv_data, int yuv_size,
 
     pts = av_rescale_q(pts, AVRational{1, (int)time_base}, codec_ctx_->time_base);
     frame_->pts = pts;
+    
     if(yuv_data) {
         int ret_size = av_image_fill_arrays(frame_->data, frame_->linesize,
                                             yuv_data, (AVPixelFormat)frame_->format,
@@ -162,10 +163,10 @@ int VideoEncoder::Encode(uint8_t *yuv_data, int yuv_size,
     {
         AVPacket *packet = av_packet_alloc();
         ret = avcodec_receive_packet(codec_ctx_, packet);
-        packet->stream_index = stream_index;
+        packet->stream_index = stream_index;//使用stream_index区分音频还是视频,  muxer时会用到
         if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
             ret = 0;
-            av_packet_free(&packet);
+            av_packet_free(&packet); //此时packet是无用的
             break;
         } else if (ret < 0) {
             char errbuf[1024] = {0};
@@ -174,7 +175,7 @@ int VideoEncoder::Encode(uint8_t *yuv_data, int yuv_size,
             av_packet_free(&packet);
             ret = -1;
         }
-        printf("h264 pts:%lld\n", packet->pts);
+        printf("Encode h264 pts:%lld\n", packet->pts);
         packets.push_back(packet);
     }
     return ret;

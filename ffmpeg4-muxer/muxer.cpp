@@ -98,7 +98,7 @@ int Muxer::SendHeader()
 int Muxer::SendPacket(AVPacket *packet)
 {
     int stream_index = packet->stream_index;
-    printf("index:%d, pts:%lld\n", stream_index, packet->pts);
+    printf("Muxer:SendPacket index:%d, pts:%lld\n", stream_index, packet->pts);
 
     if(!packet || packet->size <= 0 || !packet->data) {
         printf("packet is null\n");
