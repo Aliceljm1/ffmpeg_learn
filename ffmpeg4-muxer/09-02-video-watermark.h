@@ -55,7 +55,7 @@ int filterYuv(int argc, char** argv)
 		return -1;
 	}
 
-	// source filter
+	// source filter ,源过滤器，用于输入数据
 	char args[512];
 	sprintf(args,
 		"video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
@@ -69,7 +69,7 @@ int filterYuv(int argc, char** argv)
 		return -1;
 	}
 
-	// sink filter
+	// sink filter，接收过滤器，用于输出数据，
 	AVBufferSinkParams* bufferSink_params;
 	AVFilterContext* bufferSink_ctx;
 	const AVFilter* bufferSink = avfilter_get_by_name("buffersink");
@@ -98,12 +98,13 @@ int filterYuv(int argc, char** argv)
 	AVFilterContext* cropFilter_ctx;
 	ret = avfilter_graph_create_filter(&cropFilter_ctx, cropFilter, "crop",
 		"out_w=iw:out_h=ih/2:x=0:y=0", NULL, filter_graph);
+	//宽度不变，高度减半，剪裁坐标起始：x=0,y=0。 提取上半部分视频
 	if (ret < 0) {
 		printf("Fail to create crop filter\n");
 		return -1;
 	}
 
-	// vflip filter
+	// vflip filter， 垂直翻转
 	const AVFilter* vflipFilter = avfilter_get_by_name("vflip");
 	AVFilterContext* vflipFilter_ctx;
 	ret = avfilter_graph_create_filter(&vflipFilter_ctx, vflipFilter, "vflip", NULL, NULL, filter_graph);
@@ -112,11 +113,11 @@ int filterYuv(int argc, char** argv)
 		return -1;
 	}
 
-	// overlay filter
+	// overlay filter，叠加
 	const AVFilter* overlayFilter = avfilter_get_by_name("overlay");
 	AVFilterContext* overlayFilter_ctx;
 	ret = avfilter_graph_create_filter(&overlayFilter_ctx, overlayFilter, "overlay",
-		"y=0:H/2", NULL, filter_graph);
+		"y=H/2", NULL, filter_graph);  // y=H/2表示叠加在目标视频的半高位置
 	if (ret < 0) {
 		printf("Fail to create overlay filter\n");
 		return -1;
@@ -200,7 +201,7 @@ int filterYuv(int argc, char** argv)
 			printf("Error while add frame.\n");
 			break;
 		}
-		// filter内部自己处理
+		// filter内部自己处理 已经连接好的过滤器
 		/* pull filtered pictures from the filtergraph */
 		ret = av_buffersink_get_frame(bufferSink_ctx, frame_out);
 		if (ret < 0)
