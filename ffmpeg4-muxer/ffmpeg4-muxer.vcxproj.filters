@@ -80,5 +80,8 @@
     <ClInclude Include="filter\util.h">
       <Filter>filter</Filter>
     </ClInclude>
+    <ClInclude Include="filter\09-05-crop_flip.h">
+      <Filter>filter</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

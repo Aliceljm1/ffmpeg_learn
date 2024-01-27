@@ -150,6 +150,7 @@
     <ClInclude Include="audioencoder.h" />
     <ClInclude Include="audioresampler.h" />
     <ClInclude Include="filter\09-04-video_watermark.h" />
+    <ClInclude Include="filter\09-05-crop_flip.h" />
     <ClInclude Include="filter\util.h" />
     <ClInclude Include="muxer.h" />
     <ClInclude Include="muxing_mp4.h" />
