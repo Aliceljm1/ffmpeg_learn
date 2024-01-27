@@ -133,9 +133,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="audio-mix\audiomixer.cpp" />
     <ClCompile Include="audioencoder.cpp" />
     <ClCompile Include="audioresampler.cpp" />
-    <ClCompile Include="ffmpeg4-muxer.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="muxer.cpp" />
     <ClCompile Include="muxing_mp4.cpp" />
     <ClCompile Include="videoencoder.cpp" />
@@ -143,6 +144,8 @@
   <ItemGroup>
     <ClInclude Include="08-03-muxing_flv-ffmpeg4x.h" />
     <ClInclude Include="09-02-video-watermark.h" />
+    <ClInclude Include="audio-mix\audio_mix.h" />
+    <ClInclude Include="audio-mix\audiomixer.h" />
     <ClInclude Include="audioencoder.h" />
     <ClInclude Include="audioresampler.h" />
     <ClInclude Include="muxer.h" />

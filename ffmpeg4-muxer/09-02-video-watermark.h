@@ -49,13 +49,14 @@ int filterYuv(int argc, char** argv)
 
 	avfilter_register_all();
 
+	//1.创建filter graph
 	AVFilterGraph* filter_graph = avfilter_graph_alloc();
 	if (!filter_graph) {
 		printf("Fail to create filter graph!\n");
 		return -1;
 	}
 
-	// source filter ,源过滤器，用于输入数据
+	//2.创建 source filter ,源过滤器，用于输入数据
 	char args[512];
 	sprintf(args,
 		"video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
@@ -69,7 +70,7 @@ int filterYuv(int argc, char** argv)
 		return -1;
 	}
 
-	// sink filter，接收过滤器，用于输出数据，
+	//3.创建 sink filter，接收过滤器，用于输出数据，
 	AVBufferSinkParams* bufferSink_params;
 	AVFilterContext* bufferSink_ctx;
 	const AVFilter* bufferSink = avfilter_get_by_name("buffersink");
@@ -83,7 +84,7 @@ int filterYuv(int argc, char** argv)
 		return -1;
 	}
 
-	// split filter
+	//4.创建各种fliter,filterContext split filter
 	const AVFilter* splitFilter = avfilter_get_by_name("split");
 	AVFilterContext* splitFilter_ctx;
 	ret = avfilter_graph_create_filter(&splitFilter_ctx, splitFilter, "split", "outputs=2",
@@ -117,12 +118,13 @@ int filterYuv(int argc, char** argv)
 	const AVFilter* overlayFilter = avfilter_get_by_name("overlay");
 	AVFilterContext* overlayFilter_ctx;
 	ret = avfilter_graph_create_filter(&overlayFilter_ctx, overlayFilter, "overlay",
-		"y=H/2", NULL, filter_graph);  // y=H/2表示叠加在目标视频的半高位置
+		"y=H/1.8", NULL, filter_graph);  // y=H/2表示叠加在目标视频的半高位置
 	if (ret < 0) {
 		printf("Fail to create overlay filter\n");
 		return -1;
 	}
 
+	//5.连接各种filter
 	// src filter to split filter
 	ret = avfilter_link(bufferSrc_ctx, 0, splitFilter_ctx, 0);
 	if (ret != 0) {
@@ -197,12 +199,12 @@ int filterYuv(int argc, char** argv)
 		frame_in->data[1] = frame_buffer_in + in_width * in_height;
 		frame_in->data[2] = frame_buffer_in + in_width * in_height * 5 / 4;
 
+		//6.送入AVFrame数据，而不是AVPacket.要注意
 		if (av_buffersrc_add_frame(bufferSrc_ctx, frame_in) < 0) {
 			printf("Error while add frame.\n");
 			break;
 		}
-		// filter内部自己处理 已经连接好的过滤器
-		/* pull filtered pictures from the filtergraph */
+		//7.提取处理完毕的AVFrame,  filter内部自己处理 已经连接好的过滤器
 		ret = av_buffersink_get_frame(bufferSink_ctx, frame_out);
 		if (ret < 0)
 			break;

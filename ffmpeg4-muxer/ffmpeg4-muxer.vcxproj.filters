@@ -16,9 +16,12 @@
     <Filter Include="filter">
       <UniqueIdentifier>{7d34e575-c22c-49c9-9199-ddb81f866a8e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="audio-mix">
+      <UniqueIdentifier>{db061b4f-e662-4570-b616-899ae39f0660}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ffmpeg4-muxer.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="videoencoder.cpp">
@@ -35,6 +38,9 @@
     </ClCompile>
     <ClCompile Include="muxing_mp4.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="audio-mix\audiomixer.cpp">
+      <Filter>audio-mix</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +64,12 @@
     </ClInclude>
     <ClInclude Include="09-02-video-watermark.h">
       <Filter>filter</Filter>
+    </ClInclude>
+    <ClInclude Include="audio-mix\audio_mix.h">
+      <Filter>audio-mix</Filter>
+    </ClInclude>
+    <ClInclude Include="audio-mix\audiomixer.h">
+      <Filter>audio-mix</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
