@@ -44,11 +44,13 @@ private:
 
         uint32_t samplerate;
         uint32_t channels;
-        uint32_t bitsPerSample;
-        AVSampleFormat format;
-        std::string name;
+        uint32_t bitsPerSample;//用于计算输入数据总共有多少帧数据，
+        //nb_samples=data_size*8/bitsPerSample/channels
 
-        AVFilterContext *filterCtx;
+        AVSampleFormat format;
+        std::string filter_name;// 过滤图中每个滤镜的名字不一样即可
+
+        AVFilterContext *filterCtx;//在av_filter_link，av_buffersrc_add_frame，av_buffersink_get_frame中必须用到
     };
 
     bool initialized_ = false;

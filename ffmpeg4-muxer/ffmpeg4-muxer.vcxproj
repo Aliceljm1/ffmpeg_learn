@@ -136,6 +136,7 @@
     <ClCompile Include="audio-mix\audiomixer.cpp" />
     <ClCompile Include="audioencoder.cpp" />
     <ClCompile Include="audioresampler.cpp" />
+    <ClCompile Include="filter\util.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="muxer.cpp" />
     <ClCompile Include="muxing_mp4.cpp" />
@@ -148,6 +149,8 @@
     <ClInclude Include="audio-mix\audiomixer.h" />
     <ClInclude Include="audioencoder.h" />
     <ClInclude Include="audioresampler.h" />
+    <ClInclude Include="filter\09-04-video_watermark.h" />
+    <ClInclude Include="filter\util.h" />
     <ClInclude Include="muxer.h" />
     <ClInclude Include="muxing_mp4.h" />
     <ClInclude Include="videoencoder.h" />

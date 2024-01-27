@@ -168,7 +168,9 @@ int demux_mp4(int argc, char* argv[])
 		goto return_error;
 	}
 	getchar();
-
+	AVStream * stream=fmt_ctx->streams[0];
+	stream->nb_frames;
+	stream->codec_info_nb_frames;
 	video_index = av_find_best_stream(fmt_ctx, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
 	if (video_index == -1)
 	{

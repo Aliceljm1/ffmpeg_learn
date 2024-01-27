@@ -42,6 +42,9 @@
     <ClCompile Include="audio-mix\audiomixer.cpp">
       <Filter>audio-mix</Filter>
     </ClCompile>
+    <ClCompile Include="filter\util.c">
+      <Filter>filter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="08-03-muxing_flv-ffmpeg4x.h">
@@ -70,6 +73,12 @@
     </ClInclude>
     <ClInclude Include="audio-mix\audiomixer.h">
       <Filter>audio-mix</Filter>
+    </ClInclude>
+    <ClInclude Include="filter\09-04-video_watermark.h">
+      <Filter>filter</Filter>
+    </ClInclude>
+    <ClInclude Include="filter\util.h">
+      <Filter>filter</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

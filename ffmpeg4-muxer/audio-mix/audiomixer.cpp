@@ -7,10 +7,10 @@ AudioMixer::AudioMixer()
 {
 
     audio_mix_info_.reset(new AudioInfo);
-    audio_mix_info_->name = "amix";     // 混音用的
+    audio_mix_info_->filter_name = "amix";     // 混音用的
 
     audio_sink_info_.reset(new AudioInfo);
-    audio_sink_info_->name = "sink";    // 输出
+    audio_sink_info_->filter_name = "sink";    // 输出
 }
 
 AudioMixer::~AudioMixer()
@@ -42,7 +42,7 @@ int AudioMixer::addAudioInput(uint32_t index, uint32_t samplerate, uint32_t chan
     filterInfo.channels = channels;
     filterInfo.bitsPerSample = bitsPerSample;
     filterInfo.format = format;
-    filterInfo.name = std::string("input") + std::to_string(index);
+    filterInfo.filter_name = std::string("input") + std::to_string(index);
 
     return 0;
 }
@@ -62,7 +62,7 @@ int AudioMixer::addAudioOutput(const uint32_t samplerate, const uint32_t channel
     audio_output_info_->channels = channels;
     audio_output_info_->bitsPerSample = bitsPerSample;
     audio_output_info_->format = format;
-    audio_output_info_->name = "output";
+    audio_output_info_->filter_name = "output";
     return 0;
 }
 /*
@@ -108,7 +108,8 @@ int AudioMixer::init(const  char *duration)
     char args[512] = {0};
 
     const AVFilter *amix = avfilter_get_by_name("amix");    // 混音
-    audio_mix_info_->filterCtx = avfilter_graph_alloc_filter(filter_graph_, amix, "amix");
+    audio_mix_info_->filterCtx = avfilter_graph_alloc_filter(filter_graph_, amix, 
+        audio_mix_info_->filter_name.c_str());
     /*inputs=输入流数量, duration=决定流的结束,
      * dropout_transition= 输入流结束时,容量重整时间,
      * (longest最长输入时间,shortest最短,first第一个输入持续的时间))*/
@@ -121,7 +122,8 @@ int AudioMixer::init(const  char *duration)
     }
 
     const AVFilter *abuffersink = avfilter_get_by_name("abuffersink");
-    audio_sink_info_->filterCtx = avfilter_graph_alloc_filter(filter_graph_, abuffersink, "sink");
+    audio_sink_info_->filterCtx = avfilter_graph_alloc_filter(filter_graph_, abuffersink, 
+        audio_sink_info_->filter_name.c_str());
     if (avfilter_init_str(audio_sink_info_->filterCtx, nullptr) != 0)
     {
         printf("[AudioMixer] avfilter_init_str(abuffersink) failed.\n");
@@ -139,7 +141,7 @@ int AudioMixer::init(const  char *duration)
         printf("[AudioMixer] input(%d) args: %s\n", iter.first, args);
 
         iter.second.filterCtx = avfilter_graph_alloc_filter(filter_graph_, abuffer,
-                                                            audio_output_info_->name.c_str());
+                                                            audio_output_info_->filter_name.c_str());
 
         if (avfilter_init_str(iter.second.filterCtx, args) != 0)
         {
@@ -237,6 +239,10 @@ int AudioMixer::exit()
     return 0;
 }
 
+/**
+* 将输入音频数据，构造为AVFrame，然后调用av_buffersrc_add_frame()添加到filter graph中
+* 如果输入数据为null,则调用av_buffersrc_add_frame(XX,NULL)冲刷缓冲区
+*/
 int AudioMixer::addFrame(uint32_t index, uint8_t *inBuf, uint32_t size)
 {
     std::lock_guard<std::mutex> locker(mutex_);
@@ -259,15 +265,15 @@ int AudioMixer::addFrame(uint32_t index, uint8_t *inBuf, uint32_t size)
         avFrame->format = iter->second.format;
         avFrame->channel_layout = av_get_default_channel_layout(iter->second.channels);
         avFrame->nb_samples = size * 8 / iter->second.bitsPerSample / iter->second.channels;
-       memcpy(avFrame->extended_data[0], inBuf, size);
-         //memcpy(avFrame->data[0], inBuf, size);//测试是否和上一个等价，
-
+        
+        av_frame_get_buffer(avFrame.get(), 1);//依据媒体格式给AVFrame分配内存
+         memcpy(avFrame->extended_data[0], inBuf, size);
 
         if (av_buffersrc_add_frame(iter->second.filterCtx, avFrame.get()) != 0)
         {
             return -1;
         }
-    } else {
+    } else {//冲刷缓冲区
         if (av_buffersrc_add_frame(iter->second.filterCtx, NULL) != 0)
         {
             return -1;
@@ -297,8 +303,10 @@ int AudioMixer::getFrame(uint8_t *outBuf, uint32_t maxOutBufSize)
         return -1;
     }
 
+    //获取所有通道数据
     int size = av_samples_get_buffer_size(NULL, avFrame->channels, avFrame->nb_samples, (AVSampleFormat)avFrame->format, 1);
-
+    //why? 为什么这里用这个函数获取数据大小，而不是直接用avFrame->linesize[0] * avFrame->channels 呢？
+    //因为音频可能是planar格式，也可能是packed格式，planar格式的数据大小不一定等于linesize[0] * channels（这只是单通道数据） ,
     if (size > (int)maxOutBufSize)
     {
         return 0;
