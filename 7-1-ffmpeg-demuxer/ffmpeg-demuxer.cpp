@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 	//avio_decode_audio(argc,argv);
 	//encode_audio(argc,argv);
 	//encode_video(argc,argv);
-	muxing_flv_ffmpeg4(argc, argv);
+	//muxing_flv_ffmpeg4(argc, argv);
 	getchar();
 	return 0;
 }

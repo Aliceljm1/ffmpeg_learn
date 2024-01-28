@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ffmpeg", "ffmpeg", "{45CC6D
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ffmpeg4-muxer", "ffmpeg4-muxer\ffmpeg4-muxer.vcxproj", "{DE6B3B4E-96E9-4998-975B-5B86CAD759D6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ffplay", "ffplay\ffplay.vcxproj", "{D9D74047-7A83-475C-9B13-B4F0E1F476E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -195,6 +197,26 @@ Global
 		{DE6B3B4E-96E9-4998-975B-5B86CAD759D6}.ReleaseDLLStaticDeps|Win32.Build.0 = Release|Win32
 		{DE6B3B4E-96E9-4998-975B-5B86CAD759D6}.ReleaseDLLStaticDeps|x64.ActiveCfg = Release|x64
 		{DE6B3B4E-96E9-4998-975B-5B86CAD759D6}.ReleaseDLLStaticDeps|x64.Build.0 = Release|x64
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.Debug|Win32.Build.0 = Debug|Win32
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.Debug|x64.ActiveCfg = Debug|x64
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.Debug|x64.Build.0 = Debug|x64
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.DebugDLL|Win32.ActiveCfg = Debug|Win32
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.DebugDLL|Win32.Build.0 = Debug|Win32
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.DebugDLL|x64.ActiveCfg = Debug|x64
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.DebugDLL|x64.Build.0 = Debug|x64
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.Release|Win32.ActiveCfg = Release|Win32
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.Release|Win32.Build.0 = Release|Win32
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.Release|x64.ActiveCfg = Release|x64
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.Release|x64.Build.0 = Release|x64
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.ReleaseDLL|Win32.ActiveCfg = Release|Win32
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.ReleaseDLL|Win32.Build.0 = Release|Win32
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.ReleaseDLL|x64.ActiveCfg = Release|x64
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.ReleaseDLL|x64.Build.0 = Release|x64
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.ReleaseDLLStaticDeps|Win32.ActiveCfg = Release|Win32
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.ReleaseDLLStaticDeps|Win32.Build.0 = Release|Win32
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.ReleaseDLLStaticDeps|x64.ActiveCfg = Release|x64
+		{D9D74047-7A83-475C-9B13-B4F0E1F476E5}.ReleaseDLLStaticDeps|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
