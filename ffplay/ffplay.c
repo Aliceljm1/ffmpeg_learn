@@ -196,10 +196,10 @@ typedef struct FrameQueue {
 	Frame	queue[FRAME_QUEUE_SIZE];        // FRAME_QUEUE_SIZE  最大size, 数字太大时会占用大量的内存，需要注意该值的设置
 	int		rindex;                         // 读索引。待播放时读取此帧进行播放，播放后此帧成为上一帧
 	int		windex;                         // 写索引
-	int		size;                           // 当前总帧数
+	int		size;                           // 当前总帧数,可读的有效AVFrame数据。如果f->size >= f->max_size，则说明队列已满。不能写入
 	int		max_size;                       // 可存储最大帧数
 	int		keep_last;                      // = 1说明要在队列里面保持最后一帧的数据不释放，只在销毁队列的时候才将其真正释放
-	int		rindex_shown;                   // 初始化为0，配合keep_last=1使用
+	int		rindex_shown;                   // 依据显示过的frame总数，如果=size则说明全部帧都显示完毕。 初始化为0，配合keep_last=1使用
 	SDL_mutex* mutex;                     // 互斥量
 	SDL_cond* cond;                      // 条件变量
 	PacketQueue* pktq;                      // 数据包缓冲队列
@@ -232,6 +232,7 @@ typedef struct Decoder {
 	SDL_Thread* decoder_tid;       // 线程句柄
 } Decoder;
 
+//播放器控制器
 typedef struct VideoState {
 	SDL_Thread* read_tid;      // 读线程句柄
 	AVInputFormat* iformat;   // 指向demuxer
@@ -492,8 +493,8 @@ static int packet_queue_put_private(PacketQueue* q, AVPacket* pkt)
 		printf("q->serial = %d\n", q->serial);
 	}
 	pkt1->serial = q->serial;   //用队列序列号标记节点
-	/* 队列操作：如果last_pkt为空，说明队列是空的，新增节点为队头；
-	 * 否则，队列有数据，则让原队尾的next为新增节点。 最后将队尾指向新增节点
+	/* 队列操作：如果last_pkt为空，说明队列是空的，first,last都指向同一个对象
+	 * 否则，队列有数据，则让原队尾的next为新增节点。 最后将last_pkt设置为新指针
 	 */
 	if (!q->last_pkt)
 		q->first_pkt = pkt1;
@@ -583,7 +584,7 @@ static void packet_queue_abort(PacketQueue* q)
 {
 	SDL_LockMutex(q->mutex);
 
-	q->abort_request = 1;       // 请求退出
+	q->abort_request = 1;       // 退出标志
 
 	SDL_CondSignal(q->cond);    //释放一个条件信号
 
@@ -787,7 +788,9 @@ static void frame_queue_unref_item(Frame* vp)
 	avsubtitle_free(&vp->sub);
 }
 
-/* 初始化FrameQueue，视频和音频keep_last设置为1，字幕设置为0 */
+/* 初始化FrameQueue，视频和音频keep_last设置为1，字幕设置为0
+*因为是固定长度的环形缓冲区，一次性全部初始化数组中的AVFrame结构体, 用两个读写index来指向数组元素。实现访问
+*/
 static int frame_queue_init(FrameQueue* f, PacketQueue* pktq, int max_size, int keep_last)
 {
 	int i;
@@ -811,8 +814,7 @@ static int frame_queue_init(FrameQueue* f, PacketQueue* pktq, int max_size, int 
 
 static void frame_queue_destory(FrameQueue* f)
 {
-	int i;
-	for (i = 0; i < f->max_size; i++) {
+	for (int i = 0; i < f->max_size; i++) {
 		Frame* vp = &f->queue[i];
 		// 释放对vp->frame中的数据缓冲区的引用，注意不是释放frame对象本身
 		frame_queue_unref_item(vp);
@@ -830,7 +832,9 @@ static void frame_queue_signal(FrameQueue* f)
 	SDL_UnlockMutex(f->mutex);
 }
 
-/* 获取队列当前Frame, 在调用该函数前先调用frame_queue_nb_remaining确保有frame可读 */
+/* 获取队列当前Frame, 在调用该函数前先调用frame_queue_nb_remaining确保有frame可读
+* 环形缓冲区获取数据指定index的方法：(index + rindex) % max_size， 确保不会超过max_size. add by ljm
+*/
 static Frame* frame_queue_peek(FrameQueue* f)
 {
 	return &f->queue[(f->rindex + f->rindex_shown) % f->max_size];
@@ -851,7 +855,10 @@ static Frame* frame_queue_peek_last(FrameQueue* f)
 {
 	return &f->queue[f->rindex];    // 这时候才有意义
 }
-// 获取可写指针
+
+/**
+*获取可写指针，如果队列满了且没有退出请求则阻塞等待
+**/ 
 static Frame* frame_queue_peek_writable(FrameQueue* f)
 {
 	/* wait until we have space to put a new frame */
@@ -883,7 +890,8 @@ static Frame* frame_queue_peek_readable(FrameQueue* f)
 
 	return &f->queue[(f->rindex + f->rindex_shown) % f->max_size];
 }
-// 更新写指针
+
+// 更新写索引(windex先++，如果达到最大长度则归0回到头部。环形缓冲就是在这里实现的)
 static void frame_queue_push(FrameQueue* f)
 {
 	if (++f->windex == f->max_size)
@@ -1976,6 +1984,13 @@ static void video_refresh(void* opaque, double* remaining_time)
 	}
 }
 
+/**
+*将srcFrame的数据迁移到is->pictq中，指定pts,pos,serial等参数。
+* 具体过程是：
+1.调用frame_queue_peek_writable获取一个可写入的Frame，也就是windex指向的元素， 失败则返回-1
+2.对这个Frame参数赋值，av_frame_move_ref转移数据指针，
+3.调用frame_queue_push更新写索引windex++，指向下一个数组元素
+*/
 static int queue_picture(VideoState* is, AVFrame* src_frame, double pts,
 	double duration, int64_t pos, int serial)
 {
@@ -2485,7 +2500,7 @@ static int video_thread(void* arg)
 			duration = (frame_rate.num && frame_rate.den ? av_q2d((AVRational) { frame_rate.den, frame_rate.num }) : 0);
 			// 根据AVStream timebase计算出pts值, 单位为秒
 			pts = (frame->pts == AV_NOPTS_VALUE) ? NAN : frame->pts * av_q2d(tb);
-			// 5 将解码后的视频帧插入队列
+			// 5 将解码后的视频帧插入pictp队列，准备显示
 			ret = queue_picture(is, frame, pts, duration, frame->pkt_pos, is->viddec.pkt_serial);
 			// 6 释放frame对应的数据
 			av_frame_unref(frame);
@@ -3108,10 +3123,11 @@ out:
 }
 
 /**
- * @brief 这里是设置给ffmpeg内部，当ffmpeg内部当执行耗时操作时（一般是在执行while或者for循环的数据读取时）
+ * @brief 当ffmpeg内部当执行耗时操作时（一般是在执行while或者for循环的数据读取时）
  *          就会调用该函数
  * @param ctx
- * @return 若直接退出阻塞则返回1，等待读取则返回0
+ * @return  如果我们希望直接退出阻塞则返回1，等待读取则返回0， 比如在读大文件的时候，用户点击了关闭。
+ * 此时应该退出阻塞，而不是等待读取完毕。避免退出时卡死。
  */
 
 static int decode_interrupt_cb(void* ctx)
@@ -4213,7 +4229,7 @@ int main(int argc, char** argv)
 
 	init_opts();
 
-	signal(SIGINT, sigterm_handler); /* Interrupt (ANSI).    */
+	signal(SIGINT, sigterm_handler); /* Interrupt (ANSI).  注册ctrl+c终止操作回调   */
 	signal(SIGTERM, sigterm_handler); /* Termination (ANSI).  */
 
 	show_banner(argc, argv, options);
@@ -4255,7 +4271,7 @@ int main(int argc, char** argv)
 	SDL_EventState(SDL_USEREVENT, SDL_IGNORE);
 
 	av_init_packet(&flush_pkt);				// 初始化flush_packet
-	flush_pkt.data = (uint8_t*)&flush_pkt; // 初始化为数据指向自己本身
+	flush_pkt.data = (uint8_t*)&flush_pkt; // 初始化为数据指向自己本身， 独一无二的特殊数据
 
 	// 4. 创建窗口
 	if (!display_disable) {
