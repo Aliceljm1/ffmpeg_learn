@@ -191,7 +191,7 @@ typedef struct Frame {
 	int		flip_v;             // =1则垂直翻转， = 0则正常播放
 } Frame;
 
-/* 这是一个循环队列，windex是指其中的首元素，rindex是指其中的尾部元素. */
+/* 这是一个环形队列，windex是指其中的首元素，rindex是指其中的尾部元素. */
 typedef struct FrameQueue {
 	Frame	queue[FRAME_QUEUE_SIZE];        // FRAME_QUEUE_SIZE  最大size, 数字太大时会占用大量的内存，需要注意该值的设置
 	int		rindex;                         // 读索引。待播放时读取此帧进行播放，播放后此帧成为上一帧
@@ -199,7 +199,7 @@ typedef struct FrameQueue {
 	int		size;                           // 当前总帧数,可读的有效AVFrame数据。如果f->size >= f->max_size，则说明队列已满。不能写入
 	int		max_size;                       // 可存储最大帧数
 	int		keep_last;                      // = 1说明要在队列里面保持最后一帧的数据不释放，只在销毁队列的时候才将其真正释放
-	int		rindex_shown;                   // 依据显示过的frame总数，如果=size则说明全部帧都显示完毕。 初始化为0，配合keep_last=1使用
+	int		rindex_shown;                   // 已经显示过的frame总数，如果=size则说明全部帧都显示完毕。 初始化为0，配合keep_last=1使用
 	SDL_mutex* mutex;                     // 互斥量
 	SDL_cond* cond;                      // 条件变量
 	PacketQueue* pktq;                      // 数据包缓冲队列
@@ -902,12 +902,13 @@ static void frame_queue_push(FrameQueue* f)
 	SDL_UnlockMutex(f->mutex);
 }
 
-/* 释放当前frame，并更新读索引rindex，
+/* 释放当前rindex指向的frame，并更新读索引rindex++，size--
  * 当keep_last为1, rindex_show为0时不去更新rindex,也不释放当前frame */
 static void frame_queue_next(FrameQueue* f)
 {
 	if (f->keep_last && !f->rindex_shown) {
-		f->rindex_shown = 1; // 第一次进来没有更新，对应的frame就没有释放
+		f->rindex_shown = 1; // 第一次进来没有更新，对应的frame就没有释放, 此时rindex=0, 调用frame_queue_peek_last返回的是第一个frame。
+		//之后每次进来，rindex都会更新，但是值是上一个frame的索引。
 		return;
 	}
 	frame_queue_unref_item(&f->queue[f->rindex]);
@@ -3169,13 +3170,14 @@ static int is_realtime(AVFormatContext* s)
 /*
  * 数据都由这里读取
  * 主要功能是做解复用，从码流中分离音视频packet，并插入缓存队列
+ * 开启video_thread和audio_thread线程
  */
 static int read_thread(void* arg)
 {
 	VideoState* is = arg;
 	AVFormatContext* ic = NULL;
 	int err, i, ret;
-	int st_index[AVMEDIA_TYPE_NB];
+	int st_index[AVMEDIA_TYPE_NB];//流索引数组
 	AVPacket pkt1, * pkt = &pkt1;
 	int64_t stream_start_time;
 	int pkt_in_play_range = 0;
@@ -3389,7 +3391,7 @@ static int read_thread(void* arg)
 		if (is->paused != is->last_paused) {
 			is->last_paused = is->paused;
 			if (is->paused)
-				is->read_pause_return = av_read_pause(ic); // 网络流的时候有用
+				is->read_pause_return = av_read_pause(ic); // 网络流, 如rtsp会发送PAUSE命令,
 			else
 				av_read_play(ic);
 		}
@@ -3484,7 +3486,7 @@ static int read_thread(void* arg)
 			SDL_UnlockMutex(wait_mutex);
 			continue;
 		}
-		// 6 检测码流是否已经播放结束
+		// 6 检测码流是否已经播放结束 
 		if (!is->paused // 非暂停
 			&& // 这里的执行是因为码流读取完毕后 插入空包所致
 			(!is->audio_st // 没有音频流
