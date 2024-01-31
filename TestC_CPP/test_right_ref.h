@@ -5,6 +5,14 @@ using namespace std;
 
 #define SAFE_DELETE(p) if(p){delete p;p=nullptr;}
 
+/***
+* 在 C++ 中，左值（lvalue）、纯右值（prvalue）和将亡值（xvalue）是表达式的三种基本值类别
+*左值：可以取地址的表达式，持久存在。 int x=10; x就是左值，因为可以取地址，且x的生命周期是持久的。exp:++x, x=1,
+纯右值：字面量或不对应于存储位置的临时表达式。exp:56, x++(x是左值，x++是纯右值，因为x++是临时表达式，不对应存储位置)
+将亡值：即将被销毁的对象，它的资源可以被移动。
+*
+*/
+
 class AC
 {
 public:

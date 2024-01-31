@@ -132,6 +132,7 @@
     <ClCompile Include="TestC_CPP.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="test_forward.h" />
     <ClInclude Include="test_fread.h" />
     <ClInclude Include="test_memmove_memcpy.h" />
     <ClInclude Include="test_right_ref.h" />

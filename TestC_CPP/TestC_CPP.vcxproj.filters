@@ -35,6 +35,9 @@
     <ClInclude Include="test_right_ref.h">
       <Filter>源文件</Filter>
     </ClInclude>
+    <ClInclude Include="test_forward.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="test_unique_ptr.h">
