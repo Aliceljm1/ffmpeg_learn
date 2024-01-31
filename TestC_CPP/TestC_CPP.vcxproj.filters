@@ -26,5 +26,19 @@
     <ClInclude Include="test_memmove_memcpy.h">
       <Filter>源文件</Filter>
     </ClInclude>
+    <ClInclude Include="test_shared_ptr.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="test_weak_ptr.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="test_right_ref.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test_unique_ptr.h">
+      <Filter>源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>
